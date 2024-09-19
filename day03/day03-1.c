@@ -1,9 +1,9 @@
 #include <stdio.h>
 
-int prime_num( int num);
+int prime_num(int num);
 
 int main() {
-	
+
 	int a;
 	printf("소수인지 확인할 수를 입력하세요 :");
 	scanf_s("%d", &a);
@@ -34,7 +34,7 @@ int prime_num(int num) {
 교수님 풀이
 
 int prime_num(int num){
-	
+
 	for (int i = 2; i < num ; i++) {
 		if (num % i == 0 ) {
 			return 0;

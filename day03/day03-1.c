@@ -27,5 +27,23 @@ int prime_num(int num) {
 	else {
 		printf("소수가 아닙니다.\n");
 	}
-
+	return 0;
 }
+
+/*
+교수님 풀이
+
+int prime_num(int num){
+	
+	for (int i = 2; i < num ; i++) {
+		if (num % i == 0 ) {
+			return 0;
+		}
+	}
+	return 1;
+}
+
+0 = 소수 X
+1 = 소수
+
+*/

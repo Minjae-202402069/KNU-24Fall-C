@@ -162,7 +162,8 @@ int main()
 		printf("1. 고객 추가\n");
 		printf("2. 고객 정보 제거\n");
 		printf("3. 고객 정보 수정\n");
-		printf("4. 프로그램 종료\n");
+		printf("4. 전체 리스트 출력\n");
+		printf("5. 프로그램 종료\n");
 		printf("번호 입력: ");
 		scanf_s("%d", &opt);
 		printf("\n");
@@ -204,12 +205,15 @@ int main()
 			insert_node_priority(create_node(name, rank, order_amount, point));
 		}
 		else if (opt == 4) {
+			print_nodes();
+		}
+		else if (opt == 5) {
 			i = 0;
 		}
 		else {
 			printf("잘못된 입력입니다.\n");
 		}
-		print_nodes();
+		
 		if (i == 0) {
 			break;
 		}

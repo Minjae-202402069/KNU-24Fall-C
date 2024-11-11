@@ -102,7 +102,7 @@ void delete_node(char* name)
 	struct NODE* temp;
 
 	if (cur == NULL) {
-		printf("¸®½ºÆ®°¡ ºñ¾î ÀÖ½À´Ï´Ù.\n");
+		printf("ë¦¬ìŠ¤íŠ¸ê°€ ë¹„ì–´ ìˆìŠµë‹ˆë‹¤.\n");
 		return;
 	}
 
@@ -120,13 +120,13 @@ void delete_node(char* name)
 			temp = cur;
 			cur = cur->next;
 			free(temp);  
-			printf("%s °í°´ÀÌ »èÁ¦µÇ¾ú½À´Ï´Ù.\n", name);
+			printf("%s ê³ ê°ì´ ì‚­ì œë˜ì—ˆìŠµë‹ˆë‹¤.\n", name);
 			return;
 		}
 		cur = cur->next; 
 	}
 
-	printf("%s °í°´À» Ã£À» ¼ö ¾ø½À´Ï´Ù.\n", name);
+	printf("%s ê³ ê°ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n", name);
 }
 
 
@@ -135,9 +135,9 @@ void print_nodes()
 	struct NODE* cur = head->next;
 	printf("--------------------\n");
 	while (cur != NULL) {
-		printf("%s´ÔÀÇ ·©Å© : %d\n", cur->name, cur->customerRank);
-		printf("%s´ÔÀÇ ±¸¸Å·® : %d\n", cur->name, cur->order_amount);
-		printf("%s´ÔÀÇ Æ÷ÀÎÆ® : %d\n", cur->name, cur->point);
+		printf("%së‹˜ì˜ ë“±ê¸‰ : %d\n", cur->name, cur->customerRank);
+		printf("%së‹˜ì˜ êµ¬ë§¤ëŸ‰ : %d\n", cur->name, cur->order_amount);
+		printf("%së‹˜ì˜ í¬ì¸íŠ¸ : %d\n", cur->name, cur->point);
 		printf("\n");
 		cur = cur->next;
 	}
@@ -159,45 +159,45 @@ int main()
 	while (1)
 	{
 		printf("\n");
-		printf("1. °í°´ Ãß°¡\n");
-		printf("2. °í°´ Á¤º¸ Á¦°Å\n");
-		printf("3. °í°´ Á¤º¸ ¼öÁ¤\n");
-		printf("4. ÇÁ·Î±×·¥ Á¾·á\n");
-		printf("¹øÈ£ ÀÔ·Â: ");
+		printf("1. ê³ ê° ì¶”ê°€\n");
+		printf("2. ê³ ê° ì •ë³´ ì œê±°\n");
+		printf("3. ê³ ê° ì •ë³´ ìˆ˜ì •\n");
+		printf("4. í”„ë¡œê·¸ë¨ ì¢…ë£Œ\n");
+		printf("ë²ˆí˜¸ ì…ë ¥: ");
 		scanf_s("%d", &opt);
 		printf("\n");
 
 		if (opt == 1) {
-			printf("°í°´ ÀÌ¸§ : ");
+			printf("ê³ ê° ì´ë¦„ : ");
 			scanf_s("%s", name, 20);
 
-			printf("%s´ÔÀÇ µî±Ş : ", name);
+			printf("%së‹˜ì˜ ë“±ê¸‰(0~4) : ", name);
 			scanf_s("%d", &rank);
 
-			printf("%s´ÔÀÇ ÁÖ¹®·® : ",name);
+			printf("%së‹˜ì˜ ì£¼ë¬¸ëŸ‰ : ",name);
 			scanf_s("%d", &order_amount);
 
-			printf("%s´ÔÀÇ Æ÷ÀÎÆ® : ", name);
+			printf("%së‹˜ì˜ í¬ì¸íŠ¸ : ", name);
 			scanf_s("%d", &point);
 
 			insert_node_priority(create_node(name,rank,order_amount,point));
 		}
 		else if (opt == 2) {
-			printf("»èÁ¦ÇÒ °í°´ÀÇ ÀÌ¸§: ");
+			printf("ì‚­ì œí•  ê³ ê°ì˜ ì´ë¦„: ");
 			scanf_s("%s", name, 20);
 			delete_node(name);
 		}
 		else if (opt == 3) {
-			printf("¼öÁ¤ÇÒ °í°´ÀÇ ÀÌ¸§ : ");
+			printf("ìˆ˜ì •í•  ê³ ê°ì˜ ì´ë¦„ : ");
 			scanf_s("%s", name, 20);
 
-			printf("°í°´ µî±Ş(0~4) : ");
+			printf("ê³ ê° ë“±ê¸‰(0~4) : ");
 			scanf_s("%d", &rank);
 
-			printf("°í°´ ±¸¸Å·® : ");
+			printf("ê³ ê° êµ¬ë§¤ëŸ‰ : ");
 			scanf_s("%d", &order_amount);
 
-			printf("°í°´ Æ÷ÀÎÆ® : ");
+			printf("ê³ ê° í¬ì¸íŠ¸ : ");
 			scanf_s("%d", &point);
 
 			delete_node(name);
@@ -207,7 +207,7 @@ int main()
 			i = 0;
 		}
 		else {
-			printf("Àß¸øµÈ ÀÔ·ÂÀÔ´Ï´Ù.\n");
+			printf("ì˜ëª»ëœ ì…ë ¥ì…ë‹ˆë‹¤.\n");
 		}
 		print_nodes();
 		if (i == 0) {

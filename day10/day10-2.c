@@ -172,7 +172,7 @@ int main()
 			printf("고객 이름 : ");
 			scanf_s("%s", name, 20);
 
-			printf("%s님의 등급(0~4) : ", name);
+			printf("%s님의 등급(1~5) : ", name);
 			scanf_s("%d", &rank);
 
 			printf("%s님의 주문량 : ",name);
@@ -192,7 +192,7 @@ int main()
 			printf("수정할 고객의 이름 : ");
 			scanf_s("%s", name, 20);
 
-			printf("고객 등급(0~4) : ");
+			printf("고객 등급(1~5) : ");
 			scanf_s("%d", &rank);
 
 			printf("고객 구매량 : ");

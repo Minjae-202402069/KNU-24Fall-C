@@ -12,7 +12,7 @@ struct NODE {
 };
 
 enum rank {
-	platinum = 0,
+	platinum = 1,
 	gold,
 	silver,
 	bronze,

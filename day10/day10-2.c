@@ -120,7 +120,6 @@ void delete_node(char* name)
 			temp = cur;
 			cur = cur->next;
 			free(temp);  
-			printf("%s 고객이 삭제되었습니다.\n", name);
 			return;
 		}
 		cur = cur->next; 

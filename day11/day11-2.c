@@ -7,28 +7,28 @@ int main()
 	int start, end,n;
 	double dx, sum = 0;
 
-	printf("ÀûºĞÇÒ ½ÃÀÛ °ªÀ» ÀÔ·ÂÇÏ¼¼¿ä: ");
+	printf("ì ë¶„í•  ì‹œì‘ ê°’ì„ ì…ë ¥í•˜ì„¸ìš”: ");
 	scanf_s("%d", &start);
-	printf("ÀûºĞÇÒ ³¡ °ªÀ» ÀÔ·ÂÇÏ¼¼¿ä: ");
+	printf("ì ë¶„í•  ë ê°’ì„ ì…ë ¥í•˜ì„¸ìš”: ");
 	scanf_s("%d", &end);
-	printf("½ÃÇàÇÒ ÃÖ´ë ±¸°£À» ÀÔ·ÂÇÏ¼¼¿ä(2^n): ");
+	printf("ì‹œí–‰í•  ìµœëŒ€ êµ¬ê°„ì„ ì…ë ¥í•˜ì„¸ìš”(2^n): ");
 	scanf_s("%d", &n);
 
 	
 
     for (int k = 0; k <= n; k++) {
-        int steps = pow(2, k);  // 2^k ±¸°£
-        dx = (double)(end - start) / steps;  // °¢ ±¸°£ÀÇ ¹Øº¯
+        int steps = pow(2, k);  // 2^k êµ¬ê°„
+        dx = (double)(end - start) / steps;  // ê° êµ¬ê°„ì˜ ë°‘ë³€
 
         sum = 0;  
 
         for (int i = 0; i < steps; i++) {
-            // *¿¹½Ã* double x = pow(start + i * dx,2)+1;  
-            double x = -log10(1 / (start + i * dx)) + sin(start + i * dx); // x = ÇÔ¼öÀÇ ³ôÀÌ , pow¿¡¼­ ÇÔ¼ö ¼³Á¤
+            // *ì˜ˆì‹œ* double x = pow(start + i * dx,2)+1;  
+            double x = -log10(1 / (start + i * dx)) + sin(start + i * dx); // x = í•¨ìˆ˜ì˜ ë†’ì´ , ì´ ì‹ì—ì„œ í•¨ìˆ˜ ì„¤ì •
             sum += x * dx;
         }
             
-        printf("±¸°£ %10d, ÀûºĞ °á°ú: %.6f\n", steps, sum);
+        printf("êµ¬ê°„ %10d, ì ë¶„ ê²°ê³¼: %.6f\n", steps, sum);
     }
 
     return 0;

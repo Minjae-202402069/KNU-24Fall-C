@@ -1,0 +1,177 @@
+#include <conio.h> 
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <io.h> 
+#include <Windows.h>
+
+int i, j, height = 20, width = 20;
+int gameover, score;
+int x, y, fruitx, fruity, flag;
+int tailX[100], tailY[100];  // 뱀의 몸통 좌표 배열
+int length;  // 뱀의 길이
+
+// Function to generate the fruit 
+// within the boundary 
+void setup()
+{
+    gameover = 0;
+    x = height / 2;
+    y = width / 2;
+
+    // 뱀의 길이를 1로 초기화
+    length = 0;
+
+    fruitx = 0;
+    while (fruitx == 0) {
+        fruitx = rand() % 20;
+    }
+
+    fruity = 0;
+    while (fruity == 0) {
+        fruity = rand() % 20;
+    }
+
+    score = 0;
+}
+
+// Function to draw the boundaries 
+void draw()
+{
+    system("cls");
+
+    for (i = 0; i < height; i++) {
+        for (j = 0; j < width; j++) {
+            if (i == 0 || i == width - 1 || j == 0 || j == height - 1) {
+                printf("#");
+            }
+            else {
+                // 뱀의 몸통을 그리기
+                int isSnakePart = 0;
+                for (int k = 0; k < length; k++) {
+                    if (tailX[k] == i && tailY[k] == j) {
+                        printf("o");
+                        isSnakePart = 1;
+                        break;
+                    }
+                }
+
+                if (!isSnakePart) {
+                    if (i == x && j == y)  // 머리
+                        printf("0");
+                    else if (i == fruitx && j == fruity)  // 과일
+                        printf("*");
+                    else
+                        printf(" ");
+                }
+            }
+        }
+        printf("\n");
+    }
+
+    // 점수 출력
+    printf("score = %d", score);
+    printf("\n");
+    printf("press X to quit the game");
+}
+
+// Function to take the input 
+void input()
+{
+    if (_kbhit()) {
+        switch (getch()) {
+        case 'a':
+            flag = 1;
+            break;
+        case 's':
+            flag = 2;
+            break;
+        case 'd':
+            flag = 3;
+            break;
+        case 'w':
+            flag = 4;
+            break;
+        case 'x':
+            gameover = 1;
+            break;
+        }
+    }
+}
+
+// Function for the logic behind each movement
+void logic()
+{
+    int prevX = tailX[0];
+    int prevY = tailY[0];
+    int prev2X, prev2Y;
+    tailX[0] = x;
+    tailY[0] = y;
+
+    for (int i = 1; i < length; i++) {
+        prev2X = tailX[i];
+        prev2Y = tailY[i];
+        tailX[i] = prevX;
+        tailY[i] = prevY;
+        prevX = prev2X;
+        prevY = prev2Y;
+    }
+
+    switch (flag) {
+    case 1:
+        y--;
+        break;
+    case 2:
+        x++;
+        break;
+    case 3:
+        y++;
+        break;
+    case 4:
+        x--;
+        break;
+    default:
+        break;
+    }
+
+    // 벽과 충돌 확인
+    if (x < 0 || x >= height || y < 0 || y >= width)
+        gameover = 1;
+
+    // 자기 자신과 충돌 확인
+    for (int i = 0; i < length; i++) {
+        if (tailX[i] == x && tailY[i] == y) {
+            gameover = 1;
+        }
+    }
+
+    // 과일 먹었을 때
+    if (x == fruitx && y == fruity) {
+        score += 10;
+        length++;  // 뱀 길이 증가
+
+        // 새로운 과일 위치 설정
+        fruitx = 0;
+        while (fruitx == 0) {
+            fruitx = rand() % 20;
+        }
+
+        fruity = 0;
+        while (fruity == 0) {
+            fruity = rand() % 20;
+        }
+    }
+}
+
+void main()
+{
+    // 게임 초기화
+    setup();
+
+    // 게임 진행
+    while (!gameover) {
+        draw();
+        input();
+        logic();
+        Sleep(100);  // 게임 속도 조절
+    }
+}

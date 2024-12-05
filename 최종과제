@@ -7,28 +7,65 @@
 int i, j, height = 20, width = 20;
 int gameover, score;
 int x, y, fruitx, fruity, flag;
+int item_mapx, item_mapy, item_divx, item_divy,item_halfx,item_halfy;
 int tailX[100], tailY[100];  // 뱀의 몸통 좌표 배열
 int length;  // 뱀의 길이
+int choose_map;
+int choose_mode;
 
 // Function to generate the fruit 
 // within the boundary 
 void setup()
 {
-    gameover = 0;
-    x = height / 2;
-    y = width / 2;
+    if (choose_mode == 1) {
+        height = 28, width = 28;
+        x = height / 2-5;
+        y = width / 2-5;
+    }
+    if (choose_mode == 2) {
+        x = height / 2;
+        y = width / 2;
+    }
+    if (choose_mode == 3) {
+        // height = 16, width = 16; #나중에 아이템 먹었을 때 감소될 크기
+        x = height / 2;
+        y = width / 2;
 
+        item_mapx = 0;
+        while (item_mapx == 0) {
+            item_mapx = rand() % height;
+        }
+
+        item_mapy = 0;
+        while (item_mapy == 0) {
+            item_mapy = rand() % width;
+        }
+    }
+    gameover = 0;
+    
     // 뱀의 길이를 1로 초기화
     length = 0;
 
+    // 과일 생성
     fruitx = 0;
     while (fruitx == 0) {
-        fruitx = rand() % 20;
+        fruitx = rand() % height;
     }
 
     fruity = 0;
     while (fruity == 0) {
-        fruity = rand() % 20;
+        fruity = rand() % width;
+    }
+
+    // 꼬리 절반 줄이는 아이템 생성
+    item_halfx = 0;
+    while (item_halfx == 0) {
+        item_halfx = rand() % height;
+    }
+
+    item_halfy = 0;
+    while (item_halfy == 0) {
+        item_halfy = rand() % width;
     }
 
     score = 0;
@@ -49,7 +86,7 @@ void draw()
                 int isSnakePart = 0;
                 for (int k = 0; k < length; k++) {
                     if (tailX[k] == i && tailY[k] == j) {
-                        printf("o");
+                        printf("□");
                         isSnakePart = 1;
                         break;
                     }
@@ -57,9 +94,13 @@ void draw()
 
                 if (!isSnakePart) {
                     if (i == x && j == y)  // 머리
-                        printf("0");
+                        printf("□");
                     else if (i == fruitx && j == fruity)  // 과일
                         printf("*");
+                    else if (i == item_mapx && j == item_mapy) // 맵 줄이기 아이템
+                        printf("▣");
+                    else if (i == item_halfx && j == item_halfy) // 꼬리 절반 줄이기 아이템
+                        printf("♥");
                     else
                         printf(" ");
                 }
@@ -147,6 +188,9 @@ void logic()
     // 과일 먹었을 때
     if (x == fruitx && y == fruity) {
         score += 10;
+        if (choose_mode == 1) {
+            score += 10;
+        }
         length++;  // 뱀 길이 증가
 
         // 새로운 과일 위치 설정
@@ -160,10 +204,65 @@ void logic()
             fruity = rand() % 20;
         }
     }
+    // 맵 줄이기 아이템 먹었을 때
+    if (x == item_mapx && y == item_mapy) {
+        height = 16, width = 16;
+
+        item_mapx = 0;
+        item_mapy = 0;
+    }
+    // 꼬리 절반 줄이는 아이템 먹었을 때
+     if (x == item_halfx && y == item_halfy) {
+        length = length / 2;
+
+        item_halfx = 0;
+        item_halfy = 0;
+    }
+
+    // 점수가 200의 배수일 때 꼬리 절반 줄이는 아이템 생성
+    if (score % 200 == 0 && item_halfx == 0 && item_halfy == 0) {
+        item_halfx = rand() % height;
+        item_halfy = rand() % width;
+    }
+}
+
+void lobby() {
+
+}
+
+void mode() {
+    printf("난이도 설정.\n");
+    printf("1. 쉬움\n");
+    printf("2. 보통\n");
+    printf("3.어려움\n");
+    while (1) {
+        printf("원하는 난이도를 선택하세요: ");
+        scanf_s("%d", &choose_mode);
+        if (choose_mode == 1) {
+            printf("쉬움 난이도 선택");
+            Sleep(300);
+            break;
+        }
+        else if (choose_mode == 2) {
+            printf("보통 난이도 선택");
+            Sleep(300);
+            break;
+        }
+        else if (choose_mode == 3) {
+            printf("어려움 난이도 선택");
+            Sleep(300);
+            break;
+        }
+        else {
+            printf("잘못된 입력입니다.");
+        }
+    }
+   
 }
 
 void main()
 {
+    mode();
     // 게임 초기화
     setup();
 
@@ -174,4 +273,5 @@ void main()
         logic();
         Sleep(100);  // 게임 속도 조절
     }
+
 }

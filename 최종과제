@@ -7,23 +7,22 @@
 int i, j, height = 20, width = 20;
 int gameover, score;
 int x, y, fruitx, fruity, flag;
-int flag_div, x_div, y_div,div_snake=0; // 분할 뱀
+int flag_div, x_div, y_div, div_snake = 0; // 분할 뱀
 int item_mapx, item_mapy, item_divx, item_divy, item_halfx, item_halfy; // 아이템
 int tailX[100], tailY[100], tailX_div[100], tailY_div[100];  // 뱀의 몸통 좌표 배열
 int length, length_div;  // 뱀의 길이
-int choose_map;
-int width_rand[11];
-int height_rand[11];
-int easy_score[10] = { 0 }, normal_score[10] = { 0 }, hard_score[10] = { 0 };
-int order;
-int choose_mode;
+int choose_map; // 맵 선택을 위한 변수
+int width_rand[11]; // 2번 맵에서 랜덤 할당을 위한 길이 변수
+int height_rand[11]; // 2번 맵에서 랜덤 할당을 위한 높이 변수
+int easy_score[10] = { 0 }, normal_score[10] = { 0 }, hard_score[10] = { 0 }; // 랭킹을 위한 스코어 배열
+int order; // 로비에서 명령을 받기 위한 변수
+int choose_mode; // 모드를 선택하기 위한 변수
+char dir = 'd'; // 초기 방향을 오른쪽('d')으로 설정
 
 // Function to generate the fruit 
 // within the boundary 
 void setup()
 {
-
-    
     // 난이도 쉬움 
     if (choose_mode == 1) {
         height = 28, width = 28;
@@ -69,7 +68,7 @@ void setup()
 
     length = 0;
 
-    int k = 0;
+    int k = 0; // 만약 랜덤 #이 벽에 생성되면 다시 실행
     while (k <= 10) {
         if (width_rand[k] == width || height_rand[k] == height) {
             continue;
@@ -83,15 +82,16 @@ void setup()
 
     flag = 0; //다시 맵을 켰을 때 방향 초기화
 
-    fruitx = 0;
-    while (fruitx == 0) {
+    fruitx = 0; // 과일이 벽에 생성되면 다시 실행
+    while (fruitx == width || fruitx == 0) {
         fruitx = rand() % 20;
     }
 
     fruity = 0;
-    while (fruity == 0) {
+    while (fruity == height || fruity == 0) {
         fruity = rand() % 20;
     }
+
 
     // 꼬리 절반 줄이는 아이템 생성
     item_halfx = 0;
@@ -104,181 +104,237 @@ void setup()
         item_halfy = rand() % width;
     }
 
-    check_fruits(fruitx, fruity);
+    check_fruits(fruitx, fruity); // 과일을 검사하는 함수 실행
 
     score = 0;
 }
 
+void update_snakes() {
+    // 첫 번째 뱀 업데이트
+    for (int i = length - 1; i > 0; i--) {
+        tailX[i] = tailX[i - 1];
+        tailY[i] = tailY[i - 1];
+    }
+    tailX[0] = x;
+    tailY[0] = y;
+
+    // 두 번째 뱀 업데이트 (분할 상태에서만)
+    if (div_snake == 1) {
+        for (int i = length_div - 1; i > 0; i--) {
+            tailX_div[i] = tailX_div[i - 1];
+            tailY_div[i] = tailY_div[i - 1];
+        }
+        tailX_div[0] = x_div;
+        tailY_div[0] = y_div;
+    }
+}
+
+void draw_snakes() {
+    // 첫 번째 뱀 그리기
+    for (int i = 0; i < length; i++) {
+        printf("\033[%d;%dH□", tailX[i], tailY[i]);
+    }
+
+    // 두 번째 뱀 그리기 (분할 상태에서만)
+    if (div_snake == 1) {
+        for (int i = 0; i < length_div; i++) {
+            printf("\033[%d;%dH■", tailX_div[i], tailY_div[i]);
+        }
+    }
+}
+
 // Function to draw the boundaries 
-void draw_map1() {
+void draw_map1() { // 맵 1 함수
     system("cls");
     for (i = 0; i < height; i++) {
-        for (j = 0; j < width; j++) {
+        for (j = 0; j < width; j++) { // 중간에 벽 생성을 위한 if 조건문
             if (i == 0 || i == height - 1 || j == 0 || j == width - 1 || (j == width / 2 && !((i > 0 && i < 4) || (i > height - 5 && i < height - 1)))) {
                 printf("#");
             }
             else {
                 int isSnakePart = 0;
+
+                // 첫 번째 뱀 확인
                 for (int k = 0; k < length; k++) {
                     if (tailX[k] == i && tailY[k] == j) {
-                        printf("□");
+                        printf("□"); // 첫 번째 뱀의 모양
                         isSnakePart = 1;
                         break;
                     }
                 }
 
-                if (!isSnakePart) {
-                   if (i == x && j == y)
-                        printf("□");
-                    else if (i == fruitx && j == fruity)
-                        printf("*");
-                    else if (choose_mode==3&&i == item_mapx && j == item_mapy) // 맵 줄이기 아이템
-                        printf("▣");
-                    else if (i == item_halfx && j == item_halfy) // 꼬리 절반 줄이기 아이템
-                        printf("♥");
-                    else if (choose_mode==3&&i == item_divx && j == item_divy) // 분할 아이템
-                        printf("↔");
-                    else
-                        printf(" ");
-                }
-            }
-        }
-        printf("\n");
-    }
-
-    printf("score = %d", score);
-    printf("\n");
-    printf("press X to quit the game\n");
-}
-
-void draw_map2() {
-    system("cls");
-    for (i = 0; i < height; i++) {
-        for (j = 0; j < width; j++) {
-            int rand_tile = 0;
-
-            for (int k = 0; k < 10; k++) {
-                if (i == width_rand[k] && j == height_rand[k]) {
-                    rand_tile = 1;
-                    break;
-                }
-            }
-
-            if (i == 0 || i == width - 1 || j == 0 || j == height - 1 || rand_tile) {
-                printf("#");
-            }
-            else {
-                int isSnakePart = 0;
-                for (int k = 0; k < length; k++) {
-                    if (tailX[k] == i && tailY[k] == j) {
-                        printf("□");
-                        isSnakePart = 1;
-                        break;
+                // 두 번째 뱀 확인 (분할 상태에서만 그리기)
+                if (!isSnakePart && div_snake == 1) {
+                    for (int k = 0; k < length_div; k++) {
+                        if (tailX_div[k] == i && tailY_div[k] == j) {
+                            printf("■"); // 두 번째 뱀의 모양
+                            isSnakePart = 1;
+                            break;
+                        }
                     }
                 }
 
+                // 나머지 요소 출력
                 if (!isSnakePart) {
-                    if (i == x && j == y)
+                    if (i == x && j == y) { // 첫 번째 뱀의 머리
                         printf("□");
-                    else if (i == fruitx && j == fruity)
-                        printf("*");
-                    else if (choose_mode==3&&i == item_mapx && j == item_mapy) // 맵 줄이기 아이템
-                        printf("▣");
-                    else if (i == item_halfx && j == item_halfy) // 꼬리 절반 줄이기 아이템
-                        printf("♥");
-                    else if (choose_mode==3&&i == item_divx && j == item_divy) // 분할 아이템
-                        printf("↔");
-                    else
-                        printf(" ");
-                }
-            }
-        }
-        printf("\n");
-    }
-
-    printf("score = %d", score);
-    printf("\n");
-    printf("press X to quit the game\n");
-}
-
-void draw_default() {
-    system("cls");
-    for (i = 0; i < height; i++) {
-        for (j = 0; j < width; j++) {
-            if (i == 0 || i == width - 1 || j == 0 || j == height - 1) {
-                printf("#");
-            }
-            else {
-                int isSnakePart = 0;
-                for (int k = 0; k < length; k++) {
-                    if (tailX[k] == i && tailY[k] == j) {
-                        printf("□");
-                        isSnakePart = 1;
-                        break;
                     }
-                }
-
-                if (!isSnakePart) {
-                    if (i == x && j == y)
-                        printf("□");
-                    else if (i == fruitx && j == fruity)
-                        printf("*");
-                    else if (choose_mode == 3 && i == item_mapx && j == item_mapy) // 맵 줄이기 아이템
-                        printf("▣");
-                    else if (i == item_halfx && j == item_halfy) // 꼬리 절반 줄이기 아이템
-                        printf("♥");
-                    else if (choose_mode == 3 && i == item_divx && j == item_divy) // 분할 아이템
-                        printf("↔");
-                    else
-                        printf(" ");
-                }
-            }
-        }
-        printf("\n");
-    }
-
-    printf("score = %d", score);
-    printf("\n");
-    printf("press X to quit the game\n");
-}
-
-void draw_div()
-{
-    system("cls");
-
-    for (i = 0; i < height; i++) {
-        for (j = 0; j < width; j++) {
-            if (i == 0 || i == width - 1 || j == 0 || j == height - 1) {
-                printf("#");
-            }
-            else {
-                // 뱀의 몸통을 그리기
-                int isSnakePart = 0;
-                for (int k = 0; k < length; k++) {
-                    if (tailX[k] == i && tailY[k] == j) {
+                    else if (div_snake == 1 && i == x_div && j == y_div) { // 두 번째 뱀의 머리
                         printf("■");
-                        isSnakePart = 1;
-                        break;
                     }
-                }
-
-                if (!isSnakePart) {
-                    if (i == x && j == y)  // 머리
-                        printf("■");
-                    else if (i == fruitx && j == fruity)  // 과일
+                    else if (i == fruitx && j == fruity) { // 열매
                         printf("*");
-                    else
+                    }
+                    else if (choose_mode == 3 && i == item_mapx && j == item_mapy) { // 맵 줄이기 아이템
+                        printf("▣");
+                    }
+                    else if (i == item_halfx && j == item_halfy) { // 꼬리 절반 줄이기 아이템
+                        printf("♥");
+                    }
+                    else if (div_snake == 0 && choose_mode == 3 && i == item_divx && j == item_divy) { // 분할 아이템
+                        printf("↔");
+                    }
+                    else {
                         printf(" ");
+                    }
                 }
             }
         }
         printf("\n");
     }
 
-    // 점수 출력
     printf("score = %d", score);
     printf("\n");
-    printf("press X to quit the game");
+    printf("press X to quit the game\n");
+}
+
+
+void draw_map2() { // 맵 2 함수
+    system("cls");
+    for (i = 0; i < height; i++) {
+        for (j = 0; j < width; j++) { // 벽 생성
+            if (i == 0 || i == height - 1 || j == 0 || j == width - 1 || (j == width / 2 && !((i > 0 && i < 4) || (i > height - 5 && i < height - 1)))) {
+                printf("#");
+            }
+            else {
+                int isSnakePart = 0;
+
+                // 첫 번째 뱀 확인
+                for (int k = 0; k < length; k++) {
+                    if (tailX[k] == i && tailY[k] == j) {
+                        printf("□"); // 첫 번째 뱀의 모양
+                        isSnakePart = 1;
+                        break;
+                    }
+                }
+
+                // 두 번째 뱀 확인 (분할 상태에서만 그리기)
+                if (!isSnakePart && div_snake == 1) {
+                    for (int k = 0; k < length_div; k++) {
+                        if (tailX_div[k] == i && tailY_div[k] == j) {
+                            printf("■"); // 두 번째 뱀의 모양
+                            isSnakePart = 1;
+                            break;
+                        }
+                    }
+                }
+
+                // 나머지 요소 출력
+                if (!isSnakePart) {
+                    if (i == x && j == y) { // 첫 번째 뱀의 머리
+                        printf("□");
+                    }
+                    else if (div_snake == 1 && i == x_div && j == y_div) { // 두 번째 뱀의 머리
+                        printf("■");
+                    }
+                    else if (i == fruitx && j == fruity) { // 열매
+                        printf("*");
+                    }
+                    else if (choose_mode == 3 && i == item_mapx && j == item_mapy) { // 맵 줄이기 아이템
+                        printf("▣");
+                    }
+                    else if (i == item_halfx && j == item_halfy) { // 꼬리 절반 줄이기 아이템
+                        printf("♥");
+                    }
+                    else if (div_snake == 0 && choose_mode == 3 && i == item_divx && j == item_divy) { // 분할 아이템
+                        printf("↔");
+                    }
+                    else {
+                        printf(" ");
+                    }
+                }
+            }
+        }
+        printf("\n");
+    }
+
+    printf("score = %d", score);
+    printf("\n");
+    printf("press X to quit the game\n");
+}
+
+void draw_default() { // 기본 맵 함수
+    system("cls");
+    for (i = 0; i < height; i++) {
+        for (j = 0; j < width; j++) { // 벽 생성
+            if (i == 0 || i == height - 1 || j == 0 || j == width - 1) {
+                printf("#");
+            }
+            else {
+                int isSnakePart = 0;
+
+                // 첫 번째 뱀 확인
+                for (int k = 0; k < length; k++) {
+                    if (tailX[k] == i && tailY[k] == j) {
+                        printf("□"); // 첫 번째 뱀의 모양
+                        isSnakePart = 1;
+                        break;
+                    }
+                }
+
+                // 두 번째 뱀 확인 (분할 상태에서만 그리기)
+                if (!isSnakePart && div_snake == 1) {
+                    for (int k = 0; k < length_div; k++) {
+                        if (tailX_div[k] == i && tailY_div[k] == j) {
+                            printf("■"); // 두 번째 뱀의 모양
+                            isSnakePart = 1;
+                            break;
+                        }
+                    }
+                }
+
+                // 나머지 요소 출력
+                if (!isSnakePart) {
+                    if (i == x && j == y) { // 첫 번째 뱀의 머리
+                        printf("□");
+                    }
+                    else if (div_snake == 1 && i == x_div && j == y_div) { // 두 번째 뱀의 머리
+                        printf("■");
+                    }
+                    else if (i == fruitx && j == fruity) { // 열매
+                        printf("*");
+                    }
+                    else if (choose_mode == 3 && i == item_mapx && j == item_mapy) { // 맵 줄이기 아이템
+                        printf("▣");
+                    }
+                    else if (i == item_halfx && j == item_halfy) { // 꼬리 절반 줄이기 아이템
+                        printf("♥");
+                    }
+                    else if (div_snake == 0 && choose_mode == 3 && i == item_divx && j == item_divy) { // 분할 아이템
+                        printf("↔");
+                    }
+                    else {
+                        printf(" ");
+                    }
+                }
+            }
+        }
+        printf("\n");
+    }
+
+    printf("score = %d", score);
+    printf("\n");
+    printf("press X to quit the game\n");
 }
 
 // Function to take the input 
@@ -303,133 +359,69 @@ void input()
             break;
         }
     }
-    
+
 }
 
-void input_div()
-{
-    if (_kbhit()) {
-        switch (getch()) {
-        case '4':
-            flag = 1;
-            break;
-        case '5':
-            flag = 2;
-            break;
-        case '6':
-            flag = 3;
-            break;
-        case '8':
-            flag = 4;
-            break;
-        case 'x':
-            gameover = 1;
-            break;
-        }
-    }
-}
+void handle_split() {
+    // 분할 아이템을 먹었을 때 실행
+    if (div_snake == 1) {
+        // 기존 뱀의 절반 길이를 새로운 뱀에 할당
+        length_div = length / 2; // 분할된 뱀의 길이
+        length -= length_div;   // 기존 뱀의 길이는 절반으로 줄어듦
 
-void logic_div()
-{
-    int prevX_div = tailX_div[0];
-    int prevY_div = tailY_div[0];
-    int prev2X_div, prev2Y_div;
-    tailX_div[0] = x;
-    tailY_div[0] = y;
-
-    for (int j = 1; j < length; j++) {
-        prev2X_div = tailX_div[j];
-        prev2Y_div = tailY_div[j];
-        tailX_div[j] = prevX_div;
-        tailY_div[j] = prevY_div;
-        prevX_div = prev2X_div;
-        prevY_div = prev2Y_div;
-    }
-
-    switch (flag_div) {
-    case 1:
-        y_div--;
-        break;
-    case 2:
-        x_div++;
-        break;
-    case 3:
-        y_div++;
-        break;
-    case 4:
-        x_div--;
-        break;
-    default:
-        break;
-    }
-
-
-
-    // 분할 뱀의 벽과 충돌 확인
-    if (x_div < 0 || x_div >= height || y_div < 0 || y_div >= width)
-        gameover = 1;
-
-    if (choose_map == 1) {
-        if (y_div == width / 2 && !(x_div > 0 && x_div < 4) && !(x_div > height - 5 && x_div < height - 1)) {
-            gameover = 1;
-        }
-    }
-
-    if (choose_map == 2) {
-        for (int i = 0; i <= 10; i++) {
-            if (x_div == width_rand[i] && y_div == height_rand[i])
-                gameover = 1;
-        }
-    }
-
-    // 분할 뱀의 자기 자신과 충돌 확인
-    for (int j = 0; j < length; j++) {
-        if (tailX_div[j] == x_div && tailY_div[j] == y_div) {
-            gameover = 1;
-        }
-    }
-
-    // 분할 뱀이 과일을 먹었을 때
-    if (x_div == fruitx && y_div == fruity) {
-        score += 10;
-        if (choose_mode == 1) {
-            score += 10;
-        }
-        length_div++;  // 뱀 길이 증가
-
-        // 새로운 과일 위치 설정
-        fruitx = 0;
-        while (fruitx == 0) {
-            fruitx = rand() % 20;
+        // 기존 뱀 꼬리 배열의 뒤쪽 절반을 새로운 뱀으로 이동
+        for (int i = 0; i < length_div; i++) {
+            tailX_div[i] = tailX[length + i]; // 기존 꼬리의 뒷부분을 새로운 꼬리에 복사
+            tailY_div[i] = tailY[length + i];
         }
 
-        fruity = 0;
-        while (fruity == 0) {
-            fruity = rand() % 20;
-        }
-    }
-    // 맵 줄이기 아이템 먹었을 때
-    if (x_div == item_mapx && y_div == item_mapy) {
-        height = 16, width = 16;
+        // 새로운 뱀의 초기 위치 설정
+        x_div = tailX_div[0];
+        y_div = tailY_div[0];
 
-        item_mapx = 0;
-        item_mapy = 0;
-    }
-    // 꼬리 절반 줄이는 아이템 먹었을 때
-    if (x_div == item_halfx && y_div == item_halfy) {
-        length = length / 2;
-
-        item_halfx = 0;
-        item_halfy = 0;
-    }
-
-    // 점수가 200의 배수일 때 꼬리 절반 줄이는 아이템 생성
-    if (score % 200 == 0 && item_halfx == 0 && item_halfy == 0) {
-        item_halfx = rand() % height;
-        item_halfy = rand() % width;
+        // 분할 상태 플래그 초기화
+        div_snake = 0;
+        flag_div = 1; // 새로운 뱀 활성화 플래그
     }
 }
 
+void move_split_snake() {
+    // 새로운 뱀이 활성화되었을 경우 이동 처리
+    if (flag_div) {
+        int prevX_div = tailX_div[0];
+        int prevY_div = tailY_div[0];
+        int prev2X_div, prev2Y_div;
+
+        // 새로운 뱀의 몸을 이동시킴
+        for (int i = 1; i < length_div; i++) {
+            prev2X_div = tailX_div[i];
+            prev2Y_div = tailY_div[i];
+            tailX_div[i] = prevX_div;
+            tailY_div[i] = prevY_div;
+            prevX_div = prev2X_div;
+            prevY_div = prev2Y_div;
+        }
+
+        // 새로운 뱀 머리 좌표 이동
+        switch (flag_div) {
+        case 1:
+            y_div--;
+            break;
+        case 2:
+            x_div++;
+            break;
+        case 3:
+            y_div++;
+            break;
+        case 4:
+            x_div--;
+            break;
+        }
+
+        tailX_div[0] = x_div;
+        tailY_div[0] = y_div;
+    }
+}
 
 // Function for the logic behind each movement
 void logic()
@@ -449,6 +441,7 @@ void logic()
         prevY = prev2Y;
     }
 
+    // 첫 번째 뱀 방향 처리
     switch (flag) {
     case 1:
         y--;
@@ -466,29 +459,34 @@ void logic()
         break;
     }
 
-    if (x <= 0 || x >= height - 1 || y <= 0 || y >= width - 1)
-        gameover = 1;
+    
 
-    if (choose_map == 1) {
-        if (y == width / 2 && !(x > 0 && x < 4) && !(x > height - 5 && x < height - 1)) {
-            gameover = 1;
-        }
+    // 게임 종료 조건: 첫 번째 뱀이 벽에 닿으면 게임 오버
+    if (x <= 0 || x >= height - 1 || y <= 0 || y >= width - 1) gameover = 1;
+
+    // 가운데 벽에 닿았을 때 사망 조건
+    if (choose_map == 1 && y == width / 2 && !(x > 0 && x < 4) && !(x > height - 5 && x < height - 1)) {
+        gameover = 1;  // 가운데 벽에 충돌하면 게임 오버
     }
 
+    // 랜덤 벽에 닿았을 때 사망 조건
     if (choose_map == 2) {
         for (int i = 0; i <= 10; i++) {
-            if (x == width_rand[i] && y == height_rand[i])
-                gameover = 1;
+            if (x == width_rand[i] && y == height_rand[i]) {
+                gameover = 1;  // 랜덤 벽에 충돌하면 게임 오버
+            }
         }
     }
 
+    // 본인 몸에 닿았을 때 사망 조건
     for (int i = 0; i < length; i++) {
         if (tailX[i] == x && tailY[i] == y) {
-            gameover = 1;
+            gameover = 1;  // 자기 몸에 충돌하면 게임 오버
         }
     }
 
-    if (gameover == 1) {
+
+    if (gameover == 1) { // 난이도 별로 스코어 정렬
         if (choose_mode == 1) {
             int i;
             for (i = 0; i < 10; i++) {
@@ -532,16 +530,14 @@ void logic()
     if (x == fruitx && y == fruity) {
 
         fruitx = 0;
-        while (fruitx == 0) {
+        while (fruitx == width || fruitx == 0) {
             fruitx = rand() % 20;
         }
 
         fruity = 0;
-        while (fruity == 0) {
+        while (fruity == height || fruity == 0) {
             fruity = rand() % 20;
         }
-
-        check_fruits(fruitx, fruity);
 
         score += 10;
         if (choose_mode == 1) {
@@ -549,6 +545,9 @@ void logic()
         }
         length++;
     }
+
+    check_fruits(fruitx, fruity);
+
     // 맵 줄이기 아이템 먹었을 때
     if (x == item_mapx && y == item_mapy) {
         height = 16, width = 16;
@@ -570,20 +569,24 @@ void logic()
         item_halfy = rand() % width;
     }
 
+    // 분할 아이템을 먹었을 때
     if (x == item_divx && y == item_divy) {
-        draw_div();
-        input_div();
-        logic_div();
+        div_snake = 1;
+        handle_split();  // 분할 처리
     }
+
+    // 뱀의 움직임 로직 (기존)
+    update_snakes();  // 뱀의 위치 갱신
+    check_fruits();   // 아이템 생성 및 점수 갱신
 }
 
 
-void ranking() {
+void ranking() { // 랭킹 함수
     int rank;
     printf("1 : easy 랭킹\n2 : normal 랭킹\n3 : hard 랭킹\n선택 : ");
     scanf_s("%d", &rank, sizeof(rank));
 
-    if (rank == 1) {
+    if (rank == 1) { // 선택한 랭킹을 출력
         for (int i = 0; i < 10; i++) {
             if (easy_score[i] != 0) {
                 printf("%d등 : %d점\n", i + 1, easy_score[i]);
@@ -609,7 +612,7 @@ void ranking() {
     }
 }
 
-void mode() {
+void mode() { // 난이도 함수
     printf("난이도 설정.\n");
     printf("1. 쉬움\n");
     printf("2. 보통\n");
@@ -617,7 +620,7 @@ void mode() {
     while (1) {
         printf("원하는 난이도를 선택하세요 : ");
         scanf_s("%d", &choose_mode);
-        if (choose_mode == 1) {
+        if (choose_mode == 1) { // 난이도 별로 출력 및 break
             printf("쉬움 난이도 선택\n");
             Sleep(300);
             break;
@@ -638,44 +641,26 @@ void mode() {
     }
 }
 
-int check_fruits(fruitx, fruity) {
-    if (fruity == width || fruitx == height) {
-        fruitx = 0;
-        while (fruitx == 0) {
-            fruitx = rand() % 20;
-        }
+int check_fruits(fruitx, fruity) { // 열매가 벽에 생성되는지 확인
 
-        fruity = 0;
-        while (fruity == 0) {
-            fruity = rand() % 20;
-        }
-    }
-
-    if (choose_map == 1) {
-        if (fruitx == (y == width / 2 && !(x > 0 && x < 4) && !(x > height - 5 && x < height - 1)) ||
+    if (choose_map == 1) { // 각 맵 조건 별로 확인
+        while (fruitx == width || fruity == height || fruitx == 0 || fruity == 0 || fruitx == (y == width / 2 && !(x > 0 && x < 4) && !(x > height - 5 && x < height - 1)) ||
             fruity == (y == width / 2 && !(x > 0 && x < 4) && !(x > height - 5 && x < height - 1))) {
             fruitx = 0;
-            while (fruitx == 0) {
-                fruitx = rand() % 20;
-            }
+            fruitx = rand() % 20;
 
             fruity = 0;
-            while (fruity == 0) {
-                fruity = rand() % 20;
-            }
+            fruity = rand() % 20;
         }
     }
 
     if (choose_map == 2) {
         for (int i = 0; i <= 10; i++) {
-            if (fruitx == width_rand[i] && fruity == height_rand[i])
+            while ((fruitx != width_rand[i] && fruity != height_rand[i]) || fruitx == 0 || fruity == 0 || fruitx == width || fruity == height) {
                 fruitx = 0;
-            while (fruitx == 0) {
                 fruitx = rand() % 20;
-            }
 
-            fruity = 0;
-            while (fruity == 0) {
+                fruity = 0;
                 fruity = rand() % 20;
             }
         }
@@ -684,14 +669,14 @@ int check_fruits(fruitx, fruity) {
     return fruitx, fruity;
 }
 
-void lobby() {
+void lobby() { // 로비 함수
     printf("ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ로비ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n");
     printf("맵 선택 1번, 난이도 선택 2번, 랭킹 3번, 시작 4번, 종료 5번\n");
     printf("ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n");
     printf(">> ");
     scanf_s("%d", &order);
 
-    if (order == 1) {
+    if (order == 1) { // 명령 별로 내용 실행
         printf("맵을 선택하세요. (1, 2, 3) : ");
         scanf_s("%d", &choose_map);
         lobby();
@@ -719,42 +704,53 @@ void main()
 {
     int k = 0;
 
-    while (order != 5) {
+    while (order != 5) { // 로비에서 종료하기 전까지 반복
 
-        srand(time(NULL));
+        srand(time(NULL)); // 2번 맵 랜덤 매 라운드 변경
 
         lobby();
 
         if (order == 5)
             break;
 
-        setup();
+        if (order == 4) { // 로비에서 4번 입력 시 돌입
+            setup();
 
-        if (choose_map == 1) {
-            while (!gameover) {
-                draw_map1();
-                input();
-                logic();
-                Sleep(100);
+            if (choose_map == 1) { // 각 맵 실행
+                while (!gameover) {
+                    draw_map1();
+                    input();
+                    logic();
+                    Sleep(100);
+                    if (div_snake == 1) {
+                        draw_snakes();  // 두 번째 뱀 그리기
+                    }
+                }
             }
-        }
-        else if (choose_map == 2) {
-            while (!gameover) {
-                draw_map2();
-                input();
-                logic();
-                Sleep(100);
+            else if (choose_map == 2) {
+                while (!gameover) {
+                    draw_map2();
+                    input();
+                    logic();
+                    Sleep(100);
+                    if (div_snake == 1) {
+                        draw_snakes();  
+                    }
+                }
             }
-        }
-        else if (choose_map == 3) {
-            while (!gameover) {
-                draw_default();
-                input();
-                logic();
-                Sleep(100);
+            else if (choose_map == 3) {
+                while (!gameover) {
+                    draw_default();
+                    input();
+                    logic();
+                    Sleep(100);
+                    if (div_snake == 1) {
+                        draw_snakes();  
+                    }
+                }
             }
+            else
+                printf("해당 맵은 존재하지 않습니다.\n");
         }
-        else
-            printf("해당 맵은 존재하지 않습니다.\n");
     }
 }

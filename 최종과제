@@ -109,39 +109,6 @@ void setup()
     score = 0;
 }
 
-void update_snakes() {
-    // 첫 번째 뱀 업데이트
-    for (int i = length - 1; i > 0; i--) {
-        tailX[i] = tailX[i - 1];
-        tailY[i] = tailY[i - 1];
-    }
-    tailX[0] = x;
-    tailY[0] = y;
-
-    // 두 번째 뱀 업데이트 (분할 상태에서만)
-    if (div_snake == 1) {
-        for (int i = length_div - 1; i > 0; i--) {
-            tailX_div[i] = tailX_div[i - 1];
-            tailY_div[i] = tailY_div[i - 1];
-        }
-        tailX_div[0] = x_div;
-        tailY_div[0] = y_div;
-    }
-}
-
-void draw_snakes() {
-    // 첫 번째 뱀 그리기
-    for (int i = 0; i < length; i++) {
-        printf("\033[%d;%dH□", tailX[i], tailY[i]);
-    }
-
-    // 두 번째 뱀 그리기 (분할 상태에서만)
-    if (div_snake == 1) {
-        for (int i = 0; i < length_div; i++) {
-            printf("\033[%d;%dH■", tailX_div[i], tailY_div[i]);
-        }
-    }
-}
 
 // Function to draw the boundaries 
 void draw_map1() { // 맵 1 함수
@@ -354,6 +321,18 @@ void input()
         case 'w':
             flag = 4;
             break;
+        case 'j':
+            flag = 5;
+            break;
+        case 'k':
+            flag = 6;
+            break;
+        case 'l':
+            flag = 7;
+            break;
+        case 'i':
+            flag = 8;
+            break;
         case 'x':
             gameover = 1;
             break;
@@ -404,16 +383,16 @@ void move_split_snake() {
 
         // 새로운 뱀 머리 좌표 이동
         switch (flag_div) {
-        case 1:
+        case 5:
             y_div--;
             break;
-        case 2:
+        case 6:
             x_div++;
             break;
-        case 3:
+        case 7:
             y_div++;
             break;
-        case 4:
+        case 8:
             x_div--;
             break;
         }
@@ -426,6 +405,7 @@ void move_split_snake() {
 // Function for the logic behind each movement
 void logic()
 {
+    // 뱀의 움직임 업데이트
     int prevX = tailX[0];
     int prevY = tailY[0];
     int prev2X, prev2Y;
@@ -574,10 +554,6 @@ void logic()
         div_snake = 1;
         handle_split();  // 분할 처리
     }
-
-    // 뱀의 움직임 로직 (기존)
-    update_snakes();  // 뱀의 위치 갱신
-    check_fruits();   // 아이템 생성 및 점수 갱신
 }
 
 
@@ -722,9 +698,6 @@ void main()
                     input();
                     logic();
                     Sleep(100);
-                    if (div_snake == 1) {
-                        draw_snakes();  // 두 번째 뱀 그리기
-                    }
                 }
             }
             else if (choose_map == 2) {
@@ -733,9 +706,6 @@ void main()
                     input();
                     logic();
                     Sleep(100);
-                    if (div_snake == 1) {
-                        draw_snakes();  
-                    }
                 }
             }
             else if (choose_map == 3) {
@@ -744,9 +714,6 @@ void main()
                     input();
                     logic();
                     Sleep(100);
-                    if (div_snake == 1) {
-                        draw_snakes();  
-                    }
                 }
             }
             else

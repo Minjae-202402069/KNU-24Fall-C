@@ -179,8 +179,17 @@ void draw_map1() { // 맵 1 함수
 void draw_map2() { // 맵 2 함수
     system("cls");
     for (i = 0; i < height; i++) {
-        for (j = 0; j < width; j++) { // 벽 생성
-            if (i == 0 || i == height - 1 || j == 0 || j == width - 1 || (j == width / 2 && !((i > 0 && i < 4) || (i > height - 5 && i < height - 1)))) {
+        for (j = 0; j < width; j++) {
+            int rand_tile = 0; // 랜덤 #을 생성을 판단하기 위한 변수
+
+            for (int k = 0; k < 10; k++) {
+                if (i == width_rand[k] && j == height_rand[k]) { // 랜덤 x, y 좌표 판단
+                    rand_tile = 1;
+                    break;
+                }
+            }
+
+            if (i == 0 || i == width - 1 || j == 0 || j == height - 1 || rand_tile) { // 벽 및 랜덤 위치에 # 출력
                 printf("#");
             }
             else {
@@ -206,29 +215,19 @@ void draw_map2() { // 맵 2 함수
                     }
                 }
 
-                // 나머지 요소 출력
                 if (!isSnakePart) {
-                    if (i == x && j == y) { // 첫 번째 뱀의 머리
+                    if (i == x && j == y)
                         printf("□");
-                    }
-                    else if (div_snake == 1 && i == x_div && j == y_div) { // 두 번째 뱀의 머리
-                        printf("■");
-                    }
-                    else if (i == fruitx && j == fruity) { // 열매
+                    else if (i == fruitx && j == fruity)
                         printf("*");
-                    }
-                    else if (choose_mode == 3 && i == item_mapx && j == item_mapy) { // 맵 줄이기 아이템
+                    else if (choose_mode == 3 && i == item_mapx && j == item_mapy) // 맵 줄이기 아이템
                         printf("▣");
-                    }
-                    else if (i == item_halfx && j == item_halfy) { // 꼬리 절반 줄이기 아이템
+                    else if (i == item_halfx && j == item_halfy) // 꼬리 절반 줄이기 아이템
                         printf("♥");
-                    }
-                    else if (div_snake == 0 && choose_mode == 3 && i == item_divx && j == item_divy) { // 분할 아이템
+                    else if (choose_mode == 3 && i == item_divx && j == item_divy) // 분할 아이템
                         printf("↔");
-                    }
-                    else {
+                    else
                         printf(" ");
-                    }
                 }
             }
         }
@@ -405,7 +404,6 @@ void move_split_snake() {
 // Function for the logic behind each movement
 void logic()
 {
-    // 뱀의 움직임 업데이트
     int prevX = tailX[0];
     int prevY = tailY[0];
     int prev2X, prev2Y;
